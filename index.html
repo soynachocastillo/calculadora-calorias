@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calculadora de Calorías — Nacho Castillo</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#fff;font-family:Arial,Helvetica,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:0 0 4rem}
+
+/* HERO */
+.hero{padding:3rem 1.5rem 2.5rem;text-align:center}
+.badge{display:inline-block;background:#c6ff00;color:#0d0d0d;font-size:10px;font-weight:900;letter-spacing:2px;padding:4px 12px;margin-bottom:1.8rem;text-transform:uppercase}
+.hero-title{font-size:clamp(26px,7vw,38px);font-weight:900;line-height:1.1;margin-bottom:.8rem;font-family:'Arial Black',Arial,sans-serif}
+.hero-title span{color:#c6ff00}
+.hero-lead{font-size:15px;font-weight:700;color:#ccc;line-height:1.5;margin-bottom:.8rem}
+.hero-desc{font-size:13px;color:#666;line-height:1.7}
+
+/* FORM CARD */
+.form-card{background:#1a1a1a;border-radius:16px;padding:1.5rem;margin:0 1.5rem 1.5rem}
+.field-label{display:block;font-size:13px;font-weight:700;color:#fff;margin-bottom:10px}
+
+/* GÉNERO */
+.gender-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.2rem}
+.btn-gender{padding:14px;border:1px solid #333;background:#252525;color:#888;font-size:14px;font-weight:700;border-radius:10px;cursor:pointer;transition:all .15s;font-family:Arial,sans-serif}
+.btn-gender.active{background:#c6ff00;color:#0d0d0d;border-color:#c6ff00}
+
+/* INPUTS */
+.nc-input{width:100%;background:#252525;border:1px solid #333;color:#fff;font-size:16px;padding:14px;border-radius:10px;outline:none;-webkit-appearance:none;appearance:none;font-family:Arial,sans-serif;transition:border-color .15s;margin-bottom:1.2rem}
+.nc-input:focus{border-color:#c6ff00}
+.nc-select{width:100%;background:#252525;border:1px solid #333;color:#fff;font-size:15px;padding:14px 40px 14px 14px;border-radius:10px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;font-family:Arial,sans-serif;transition:border-color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;margin-bottom:1.2rem}
+.nc-select:focus{border-color:#c6ff00}
+
+/* BOTÓN CALCULAR */
+.btn-calc{width:100%;background:#c6ff00;color:#0d0d0d;border:none;font-size:15px;font-weight:900;padding:16px;border-radius:10px;cursor:pointer;font-family:'Arial Black',Arial,sans-serif;letter-spacing:1px;transition:background .15s,transform .1s;margin-top:4px}
+.btn-calc:hover{background:#d4ff33}
+.btn-calc:active{transform:scale(.98)}
+
+/* RESULTADOS */
+.results-section{padding:0 1.5rem;display:none}
+.results-title{font-size:22px;font-weight:900;text-align:center;margin:2rem 0 1.2rem;font-family:'Arial Black',Arial,sans-serif}
+
+/* RESULT CARDS */
+.res-card{background:#1a1a1a;border-radius:14px;padding:1.25rem;margin-bottom:12px;border:1px solid #252525}
+.res-card.c-yellow{border-color:#c6ff00}
+.res-card.c-green{border-color:#22c55e}
+.res-card-header{display:flex;align-items:center;gap:8px;margin-bottom:.6rem}
+.res-icon{width:32px;height:32px;border-radius:8px;background:#252525;display:flex;align-items:center;justify-content:center;font-size:16px}
+.res-label{font-size:13px;font-weight:700;color:#aaa}
+.res-num{font-size:clamp(36px,9vw,48px);font-weight:900;line-height:1;font-family:'Arial Black',Arial,sans-serif;color:#fff;margin-bottom:4px}
+.res-num.yellow{color:#c6ff00}
+.res-num.green{color:#22c55e}
+.res-sub{font-size:12px;color:#555}
+
+/* FAQ */
+.faq-section{padding:2.5rem 1.5rem 0}
+.faq-title{font-size:22px;font-weight:900;text-align:center;margin-bottom:1.5rem;font-family:'Arial Black',Arial,sans-serif}
+.faq-item{border-bottom:1px solid #1e1e1e}
+.faq-btn{width:100%;background:none;border:none;color:#fff;font-size:14px;font-weight:600;text-align:left;padding:1rem 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:Arial,sans-serif;line-height:1.4}
+.faq-btn:hover{color:#c6ff00}
+.faq-arrow{font-size:18px;color:#555;flex-shrink:0;transition:transform .2s}
+.faq-arrow.open{transform:rotate(180deg);color:#c6ff00}
+.faq-body{font-size:13px;color:#888;line-height:1.7;padding:0 0 1rem;display:none}
+
+/* CTA */
+.cta-section{margin:2rem 1.5rem 0;background:#1a1a1a;border-radius:14px;padding:2rem 1.5rem;text-align:center;border-top:3px solid #c6ff00}
+.cta-q{font-size:20px;font-weight:900;margin-bottom:.5rem;font-family:'Arial Black',Arial,sans-serif}
+.cta-sub{font-size:13px;color:#666;margin-bottom:1.2rem}
+.cta-btn{display:inline-block;background:#c6ff00;color:#0d0d0d;font-size:14px;font-weight:900;padding:14px 28px;border-radius:10px;text-decoration:none;font-family:'Arial Black',Arial,sans-serif;letter-spacing:.5px;transition:background .15s}
+.cta-btn:hover{background:#d4ff33}
+
+/* FOOTER */
+footer{margin-top:3rem;padding:1.5rem;border-top:1px solid #1a1a1a;text-align:center}
+footer p{font-size:10px;color:#333;letter-spacing:1.5px;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="badge">Nacho Castillo · Lifestyle Trainer</div>
+    <h1 class="hero-title">Calculadora de <span>Calorías</span></h1>
+    <p class="hero-lead">Calculá cuántas calorías necesita tu cuerpo cada día.</p>
+    <p class="hero-desc">Descubrí cuántas calorías quema tu cuerpo en reposo, cuántas gasta a lo largo del día y cuál es la cantidad ideal según tu objetivo: bajar grasa, mantenerte o ganar músculo.</p>
+  </header>
+
+  <div class="form-card">
+    <label class="field-label">Género</label>
+    <div class="gender-row">
+      <button class="btn-gender active" id="btn-masc" onclick="setGenero('hombre')">Masculino</button>
+      <button class="btn-gender" id="btn-fem" onclick="setGenero('mujer')">Femenino</button>
+    </div>
+
+    <label class="field-label" for="edad">Edad</label>
+    <input type="number" id="edad" class="nc-input" placeholder="Ej: 30" min="10" max="100" />
+
+    <label class="field-label" for="peso">Peso (kg)</label>
+    <input type="number" id="peso" class="nc-input" placeholder="Ej: 80" min="30" max="250" step="0.5" />
+
+    <label class="field-label" for="altura">Altura (cm)</label>
+    <input type="number" id="altura" class="nc-input" placeholder="Ej: 175" min="100" max="250" />
+
+    <label class="field-label" for="actividad">Nivel de Actividad</label>
+    <select id="actividad" class="nc-select">
+      <option value="1.2">Sedentario (poco o nada de ejercicio)</option>
+      <option value="1.375">Ligero (1–3 días/semana)</option>
+      <option value="1.55">Moderado (3–5 días/semana)</option>
+      <option value="1.725">Muy Activo (6–7 días/semana)</option>
+      <option value="1.9">Extra Activo (trabajo físico + doble entreno)</option>
+    </select>
+
+    <button class="btn-calc" onclick="calcular()">Calcular</button>
+  </div>
+
+  <section class="results-section" id="resultados">
+    <h2 class="results-title">Tus Resultados</h2>
+
+    <div class="res-card">
+      <div class="res-card-header">
+        <div class="res-icon">🔥</div>
+        <span class="res-label">TMB</span>
+      </div>
+      <div class="res-num" id="tmb-val">—</div>
+      <div class="res-sub">calorías/día en reposo</div>
+    </div>
+
+    <div class="res-card">
+      <div class="res-card-header">
+        <div class="res-icon">🎯</div>
+        <span class="res-label">TDEE</span>
+      </div>
+      <div class="res-num" id="tdee-val">—</div>
+      <div class="res-sub">gasto diario total</div>
+    </div>
+
+    <div class="res-card c-yellow">
+      <div class="res-card-header">
+        <div class="res-icon">📉</div>
+        <span class="res-label">Pérdida de Peso</span>
+      </div>
+      <div class="res-num yellow" id="deficit-val">—</div>
+      <div class="res-sub">déficit de −500 cal</div>
+    </div>
+
+    <div class="res-card">
+      <div class="res-card-header">
+        <div class="res-icon">⚖️</div>
+        <span class="res-label">Mantenimiento</span>
+      </div>
+      <div class="res-num" id="mant-val">—</div>
+      <div class="res-sub">mantener peso</div>
+    </div>
+
+    <div class="res-card c-green">
+      <div class="res-card-header">
+        <div class="res-icon">📈</div>
+        <span class="res-label">Aumento de Peso</span>
+      </div>
+      <div class="res-num green" id="super-val">—</div>
+      <div class="res-sub">superávit de +500 cal</div>
+    </div>
+
+    <div class="cta-section">
+      <p class="cta-q">¿Te gustaría un plan personalizado?</p>
+      <p class="cta-sub">Escribime y armamos una estrategia 100% para vos.</p>
+      <a class="cta-btn" href="https://wa.me/5493516630340?text=Hola%20Nacho%2C%20quiero%20m%C3%A1s%20info%20sobre%20el%20coaching" target="_blank">Escribime por WhatsApp</a>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <h2 class="faq-title">Preguntas Frecuentes</h2>
+
+    <div class="faq-item">
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        ¿Qué es la TMB (Tasa Metabólica Basal)?
+        <span class="faq-arrow">&#8964;</span>
+      </button>
+      <div class="faq-body">La TMB es la cantidad mínima de calorías que tu cuerpo necesita para mantener sus funciones vitales en reposo total: respirar, hacer circular la sangre, regular la temperatura corporal, etc. Es el punto de partida para calcular cuánto debés comer.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        ¿Qué es el TDEE (Gasto Energético Diario Total)?
+        <span class="faq-arrow">&#8964;</span>
+      </button>
+      <div class="faq-body">El TDEE es el total de calorías que quemás en un día teniendo en cuenta tu nivel de actividad física. Se calcula multiplicando tu TMB por un factor de actividad. Es la referencia real para saber cuánto comer según tu estilo de vida.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        ¿Cómo se calcula mi requerimiento calórico?
+        <span class="faq-arrow">&#8964;</span>
+      </button>
+      <div class="faq-body">Usamos la fórmula de Mifflin-St Jeor, considerada la más precisa actualmente. Tiene en cuenta tu peso, altura, edad y sexo para calcular tu TMB, y luego la multiplicamos por tu nivel de actividad para obtener tu TDEE.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        ¿Por qué el déficit es de 500 calorías?
+        <span class="faq-arrow">&#8964;</span>
+      </button>
+      <div class="faq-body">Un déficit de 500 kcal/día equivale aproximadamente a perder 0.5 kg por semana, que es el ritmo más sostenible y saludable para bajar grasa sin perder músculo. Déficits más grandes pueden funcionar a corto plazo pero generan rebote y pérdida muscular.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        ¿Qué nivel de actividad debo elegir?
+        <span class="faq-arrow">&#8964;</span>
+      </button>
+      <div class="faq-body">Elegí el nivel que mejor refleje tu semana promedio real. Si entrenás 3 veces pero sos sedentario el resto del día, optá por "Ligero". Si tenés un trabajo físico o entrenás intenso más de 5 días, "Muy Activo" o "Extra Activo". La mayoría de las personas se ubica entre Ligero y Moderado.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        ¿Por qué necesito una asesoría personalizada?
+        <span class="faq-arrow">&#8964;</span>
+      </button>
+      <div class="faq-body">Esta calculadora te da una base muy útil, pero cada cuerpo es distinto. La genética, el historial de dietas, los hábitos de sueño y el estrés afectan tus resultados. Con una asesoría personalizada ajustamos todo eso para que llegues a tu objetivo de forma real y sostenible.</div>
+    </div>
+
+  </section>
+
+  <footer>
+    <p>Nacho Castillo &middot; Lifestyle Trainer &middot; 2026</p>
+  </footer>
+
+</div>
+<script>
+var genero='hombre';
+
+function setGenero(g){
+  genero=g;
+  document.getElementById('btn-masc').classList.toggle('active',g==='hombre');
+  document.getElementById('btn-fem').classList.toggle('active',g==='mujer');
+}
+
+function fmt(n){
+  return Math.round(n).toLocaleString('es-AR');
+}
+
+function calcular(){
+  var edad=parseFloat(document.getElementById('edad').value);
+  var peso=parseFloat(document.getElementById('peso').value);
+  var altura=parseFloat(document.getElementById('altura').value);
+  var act=parseFloat(document.getElementById('actividad').value);
+  if(!edad||!peso||!altura){alert('Por favor completá todos los campos.');return;}
+  var mifflin;
+  if(genero==='hombre'){
+    mifflin=(10*peso)+(6.25*altura)-(5*edad)+5;
+  }else{
+    mifflin=(10*peso)+(6.25*altura)-(5*edad)-161;
+  }
+  var tdee=Math.round(mifflin*act);
+  var tmb=Math.round(mifflin);
+  document.getElementById('tmb-val').textContent=fmt(tmb);
+  document.getElementById('tdee-val').textContent=fmt(tdee);
+  document.getElementById('deficit-val').textContent=fmt(tdee-500);
+  document.getElementById('mant-val').textContent=fmt(tdee);
+  document.getElementById('super-val').textContent=fmt(tdee+500);
+  var res=document.getElementById('resultados');
+  res.style.display='block';
+  setTimeout(function(){res.scrollIntoView({behavior:'smooth',block:'start'});},100);
+}
+
+function toggleFaq(btn){
+  var body=btn.nextElementSibling;
+  var arrow=btn.querySelector('.faq-arrow');
+  var isOpen=body.style.display==='block';
+  body.style.display=isOpen?'none':'block';
+  arrow.classList.toggle('open',!isOpen);
+}
+</script>
+</body>
+</html>
